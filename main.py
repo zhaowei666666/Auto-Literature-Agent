@@ -10,9 +10,14 @@ import logging
 import os
 import sys
 
+from dotenv import load_dotenv
+
 import search_agent
 import parse_agent
 import archive_agent
+
+# 加载 .env 文件（如果存在），使 LLM_API_KEY 等环境变量自动生效
+load_dotenv()
 
 # ---------------------------------------------------------------------------
 # Logging 配置（独立 Handler）
