@@ -5,7 +5,7 @@ FROM python:3.10-slim
 WORKDIR /app
 
 # 安装系统依赖 (pdfplumber 及底层依赖)
-RUN apt-get update && apt-get install -qq --no-install-recommends \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y -qq --no-install-recommends \
     build-essential \
     && rm -rf /var/lib/apt/lists/*
 

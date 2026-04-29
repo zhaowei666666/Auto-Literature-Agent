@@ -55,6 +55,7 @@ def search_papers(query: str, max_results: int = 1) -> List[arxiv.Result]:
     )
 
     logger.info('🔍  Searching ArXiv for: "%s"', query)
+    query = query.strip()
     results: List[arxiv.Result] = []
 
     try:

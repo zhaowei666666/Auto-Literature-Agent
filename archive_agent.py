@@ -172,18 +172,38 @@ def main() -> None:
     # 兼容单篇 / 批量结果
     if isinstance(data, list):
         for item in data:
-            meta = {
-                "title": item.get("file", "Untitled").replace(".pdf", "").replace("_", " "),
-                "authors": item.get("authors", "N/A"),
-                "abstract": item.get("abstract", "N/A"),
-                "category": item.get("category", "N/A"),
-                "arxiv_url": item.get("arxiv_url", ""),
-            }
+            if "error" in item:
+                logger.warning("⚠️  跳过 %s: %s", item.get("file", "unknown"), item["error"])
+                continue
+            meta = _extract_meta_from_item(item)
             generate_report(meta, item, pdf_path=args.pdf_path, output_dir=args.output_dir)
     else:
+        if "error" in data:
+            logger.error("❌  数据中包含错误: %s", data["error"])
+            sys.exit(1)
         generate_report(data, data, pdf_path=args.pdf_path, output_dir=args.output_dir)
 
     logger.info("🎉  All done!")
+
+
+def _extract_meta_from_item(item: dict) -> dict:
+    """从 parse_agent 输出的 item 中提取元数据（缺失字段使用占位符）。"""
+    title = item.get("file", "Untitled")
+    # 尝试从文件名反推标题：移除 arXiv ID 前缀和扩展名
+    if title.endswith(".pdf"):
+        title = title[:-4]
+    # 移除 arXiv ID 前缀，如 "2604.12345v1."
+    parts = title.split(".", 2)
+    if len(parts) >= 3 and parts[0].isdigit() and len(parts[0]) == 4:
+        title = parts[2].replace("_", " ")
+    title = title.strip() or "Unknown Paper"
+    return {
+        "title": title,
+        "authors": item.get("authors", "N/A"),
+        "abstract": item.get("abstract", "N/A"),
+        "category": item.get("category", "N/A"),
+        "arxiv_url": item.get("arxiv_url", ""),
+    }
 
 
 if __name__ == "__main__":

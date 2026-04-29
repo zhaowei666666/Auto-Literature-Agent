@@ -9,10 +9,9 @@ import json
 import logging
 import os
 import sys
+import time
 from glob import glob
 from typing import Optional
-
-import time
 
 import pdfplumber
 from openai import OpenAI
@@ -137,7 +136,7 @@ def read_pdf(filepath: str, max_chars: int = DEFAULT_MAX_CHARS) -> Optional[str]
 # LLM API 调用
 # ---------------------------------------------------------------------------
 
-def _build_llm_client() -> Optional[tuple]:
+def _build_llm_client() -> Optional[tuple[OpenAI, str]]:
     """从环境变量读取配置并构建 OpenAI 客户端。"""
     api_key = os.environ.get(ENV_API_KEY)
     base_url = os.environ.get(ENV_BASE_URL)
